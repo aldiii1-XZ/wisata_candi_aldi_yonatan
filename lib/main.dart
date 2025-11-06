@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '/screens/signin_screen.dart';
+import '/data/candi_data.dart';
+import '/screens/profile_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,13 +11,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final candi = candiList.first;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Wisata Candi',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: SignInScreen(),
+      home: ProfileScreen(),
       // home: ProfileScreen(),
       // home : DetailScreen(candi: candi, candilist[0],)
     );
