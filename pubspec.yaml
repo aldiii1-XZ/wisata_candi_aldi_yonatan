@@ -10,18 +10,9 @@ dependencies:
     sdk: flutter
   cached_network_image: ^3.3.1
 flutter:
-uses-material-design: true
+  uses-material-design: true
 
-assets:
-    - images/borobudur.jpeg
-    - images/jago.jpeg
-    - images/kalasan.jpeg
-    - images/logo_candi.png
-    - images/lumbung.jpeg
-    - images/mendut.jpeg
-    - images/placeholder_image.png
-    - images/plaosan.jpeg
-    - images/prambanan.jpeg
-    - images/sari.jpeg
-    - images/sewu.jpeg
-    - images/singosari.jpeg
+  assets:
+    - assets/images/borobudur.jpg
+    - assets/images/prambanan.jpg
+    - assets/images/mendut.jpg

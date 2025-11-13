@@ -1,3 +1,4 @@
+// 📁 lib/data/candi_data.dart
 class Candi {
   final String name;
   final String location;
