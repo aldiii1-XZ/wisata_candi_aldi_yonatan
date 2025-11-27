@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -81,7 +82,21 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Validasi sederhana, bisa ditambah sesuai kebutuhan
+                  if (_usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Isi username dan password!')),
+                    );
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                 ),
