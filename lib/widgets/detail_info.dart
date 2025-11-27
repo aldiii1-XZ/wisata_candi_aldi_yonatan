@@ -1,4 +1,3 @@
-// widgets/detail_info.dart
 import 'package:flutter/material.dart';
 import '/models/candi.dart';
 
@@ -44,13 +43,21 @@ class DetailInfo extends StatelessWidget {
           ]),
           const SizedBox(height: 4),
           Row(children: [
-            const Icon(Icons.calendar_month, size: 18, color: Colors.blue,),
+            const Icon(
+              Icons.calendar_month,
+              size: 18,
+              color: Colors.blue,
+            ),
             const SizedBox(width: 6),
             Text('Dibangun: ${candi.built}'),
           ]),
           const SizedBox(height: 4),
           Row(children: [
-            const Icon(Icons.house, size: 18, color: Colors.pink,),
+            const Icon(
+              Icons.house,
+              size: 18,
+              color: Colors.pink,
+            ),
             const SizedBox(width: 6),
             Text('Tipe: ${candi.type}'),
           ]),

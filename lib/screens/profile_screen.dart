@@ -19,6 +19,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       isSignedIn = !isSignedIn;
     });
   }
+
   void signIn() => toggleSignIn();
   void signOut() => toggleSignIn();
 
@@ -32,12 +33,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: double.infinity,
             color: Colors.deepPurple,
           ),
-
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
-                // Header
                 Padding(
                   padding: const EdgeInsets.only(top: 150),
                   child: Align(
@@ -47,7 +46,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         const CircleAvatar(
                           radius: 60,
-                          backgroundImage: AssetImage('images/placeholder_image.png'),
+                          backgroundImage:
+                              AssetImage('images/placeholder_image.png'),
                         ),
                         if (isSignedIn)
                           IconButton(
@@ -59,15 +59,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
                 const Divider(color: Colors.grey),
                 const SizedBox(height: 4),
-
                 ProfileInfoItem(
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                   icon: Icons.lock,
                   label: 'Pengguna',
                   value: fullName,
@@ -78,11 +74,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 4),
                 const Divider(color: Colors.grey),
                 const SizedBox(height: 4),
-                
                 ProfileInfoItem(
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                   icon: Icons.person,
                   label: 'Nama',
                   value: userName,
@@ -93,11 +86,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 4),
                 const Divider(color: Colors.grey),
                 const SizedBox(height: 4),
-
                 ProfileInfoItem(
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                   icon: Icons.favorite,
                   label: 'Favorit',
                   value: favoriteCandiCount == 0
@@ -107,11 +97,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onEditPressed: null,
                   iconColor: Colors.redAccent,
                 ),
-
                 const SizedBox(height: 4),
                 const Divider(color: Colors.grey),
                 const SizedBox(height: 20),
-
                 TextButton(
                   onPressed: isSignedIn ? signOut : signIn,
                   child: Text(isSignedIn ? 'Sign Out' : 'Sign In'),

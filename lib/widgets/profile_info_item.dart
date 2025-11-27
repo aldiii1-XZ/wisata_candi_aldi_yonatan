@@ -15,13 +15,12 @@ class ProfileInfoItem extends StatelessWidget {
     required this.value,
     this.showEditIcon = false,
     this.onEditPressed,
-    required this.iconColor, required TextStyle style,
+    required this.iconColor,
+    required TextStyle style,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Gaya teks default sesuai tema. Jika textTheme tidak didefinisikan,
-    // fallback ke gaya kosong.
     final TextStyle labelStyle =
         Theme.of(context).textTheme.bodyMedium ?? const TextStyle();
     final TextStyle valueStyle =
@@ -30,7 +29,6 @@ class ProfileInfoItem extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Bagian 1: ikon dan label dengan lebar 1/3 dari total lebar layar.
         SizedBox(
           width: MediaQuery.of(context).size.width / 3,
           child: Row(
@@ -38,7 +36,6 @@ class ProfileInfoItem extends StatelessWidget {
             children: [
               Icon(icon, color: iconColor),
               const SizedBox(width: 8),
-              // Gunakan Expanded agar label tidak meluber keluar.
               Expanded(
                 child: Text(label, style: labelStyle),
               ),

@@ -14,7 +14,6 @@ class DetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // gambar utama dengan tinggi tetap & full lebar
         ClipRRect(
           borderRadius: const BorderRadius.only(
             bottomLeft: Radius.circular(16),
@@ -34,8 +33,6 @@ class DetailHeader extends StatelessWidget {
             ),
           ),
         ),
-
-        // tombol back di atas gambar
         SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(12),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/candi.dart';
+import '../data/candi_data.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -87,8 +88,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         candi.isFavorite
                             ? Icons.favorite
                             : Icons.favorite_border,
-                        color:
-                            candi.isFavorite ? Colors.red : Colors.grey.shade600,
+                        color: candi.isFavorite
+                            ? Colors.red
+                            : Colors.grey.shade600,
                       ),
                       onPressed: () {
                         setState(() {

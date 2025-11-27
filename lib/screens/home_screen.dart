@@ -19,13 +19,13 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Daftar Candi'),
         backgroundColor: Colors.deepPurple,
         elevation: 0,
-        centerTitle: true, // biar judul di tengah, lebih rapi
+        centerTitle: true,
       ),
       body: GridView.builder(
         padding: const EdgeInsets.all(8),
         itemCount: candiList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // tampil 2 kolom
+          crossAxisCount: 2,
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
           childAspectRatio: 0.75,

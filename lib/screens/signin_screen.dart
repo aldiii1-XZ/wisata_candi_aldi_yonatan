@@ -81,9 +81,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
-                  // TODO: Implementasi Sign In nanti
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                 ),
@@ -119,9 +117,6 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 }
 
-// ===============================
-// Sign Up Screen
-// ===============================
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -186,9 +181,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () {
-                  // TODO: Implementasi Sign Up
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                 ),
