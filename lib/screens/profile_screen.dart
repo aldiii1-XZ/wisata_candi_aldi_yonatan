@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '/screens/home_screen.dart';
+import '/screens/search_screen.dart';
 import '/widgets/profile_info_item.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -13,6 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String fullName = "";
   String userName = "";
   int favoriteCandiCount = 0;
+  int _navIndex = 3; // Profile tab
 
   void toggleSignIn() {
     setState(() {
@@ -23,9 +26,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void signIn() => toggleSignIn();
   void signOut() => toggleSignIn();
 
+  void _onNavTap(int index) {
+    if (index == _navIndex) return;
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const SearchScreen()),
+        );
+        break;
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+        break;
+      case 2:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Favorit akan tersedia setelah fitur ini diaktifkan.'),
+          ),
+        );
+        break;
+      case 3:
+        setState(() => _navIndex = index);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _navIndex,
+        onTap: _onNavTap,
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.deepPurple.shade200,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search_outlined),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_outline),
+            label: 'Favorit',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Akun',
+          ),
+        ],
+      ),
       body: Stack(
         children: [
           Container(

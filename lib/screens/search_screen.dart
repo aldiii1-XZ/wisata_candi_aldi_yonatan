@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/candi.dart';
 import '../data/candi_data.dart';
+import '/screens/home_screen.dart';
+import '/screens/profile_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -12,6 +14,7 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   final TextEditingController _controller = TextEditingController();
   List<Candi> _filteredCandis = List.from(candiList);
+  int _navIndex = 0; // Search tab
 
   void _filterCandis(String query) {
     final filtered = candiList.where((candi) {
@@ -26,12 +29,66 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
+  void _onNavTap(int index) {
+    if (index == _navIndex) return;
+    switch (index) {
+      case 0:
+        setState(() => _navIndex = index);
+        break;
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+        break;
+      case 2:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('Favorit akan tersedia setelah fitur ini diaktifkan.'),
+          ),
+        );
+        break;
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const ProfileScreen()),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Candi'),
         backgroundColor: Colors.deepPurple,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _navIndex,
+        onTap: _onNavTap,
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.deepPurple.shade200,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search_outlined),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_outline),
+            label: 'Favorit',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Akun',
+          ),
+        ],
       ),
       body: Column(
         children: [

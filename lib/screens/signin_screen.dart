@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:wisata_candi_aldi_yonatan/services/auth_service.dart';
 import 'home_screen.dart';
 
 const List<String> kCandiRecommendations = [
@@ -370,26 +371,47 @@ class _SignInScreenState extends State<SignInScreen> {
                 onTapUp: (_) => setState(() => _scaleSignIn = 1.0),
                 onTapCancel: () => setState(() => _scaleSignIn = 1.0),
                 onTap: () {
-                  if (_isSignInReady) {
-                    Navigator.of(context).pushReplacement(
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            const HomeScreen(),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          return FadeTransition(
-                              opacity: animation, child: child);
-                        },
-                      ),
-                    );
-                  } else {
+                  if (!_isSignInReady) {
                     showProfessionalAlert(
                       context,
                       title: 'Data belum lengkap',
                       message:
                           'Masukkan username dan kata sandi terlebih dahulu untuk melanjutkan.',
                     );
+                    return;
                   }
+                  final username = _usernameController.text;
+                  final password = _passwordController.text;
+
+                  if (!AuthService.instance.userExists(username)) {
+                    showProfessionalAlert(
+                      context,
+                      title: 'Akun belum terdaftar',
+                      message:
+                          'Buat akun terlebih dahulu melalui halaman Sign Up sebelum masuk.',
+                    );
+                    return;
+                  }
+
+                  if (!AuthService.instance.validate(username, password)) {
+                    showProfessionalAlert(
+                      context,
+                      title: 'Kredensial salah',
+                      message: 'Periksa kembali username dan kata sandi kamu.',
+                    );
+                    return;
+                  }
+
+                  Navigator.of(context).pushReplacement(
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const HomeScreen(),
+                      transitionsBuilder:
+                          (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                    ),
+                  );
                 },
                 child: AnimatedScale(
                   scale: _scaleSignIn,
@@ -631,14 +653,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       message:
                           'Pastikan nama, username, dan kata sandi terisi sebelum melanjutkan.',
                     );
+                    return;
                   } else {
-                    showProfessionalAlert(
-                      context,
-                      title: 'Pendaftaran siap',
-                      message:
-                          'Data sudah lengkap. Kamu bisa lanjutkan proses pendaftaran atau kembali ke halaman sebelumnya.',
-                      isSuccess: true,
+                    final registered = AuthService.instance.register(
+                      username: _usernameController.text,
+                      password: _passwordController.text,
+                      fullName: _nameController.text,
                     );
+                    if (registered) {
+                      showProfessionalAlert(
+                        context,
+                        title: 'Pendaftaran berhasil',
+                        message:
+                            'Akun sudah dibuat. Silakan kembali ke halaman Sign In untuk masuk.',
+                        isSuccess: true,
+                      );
+                    } else {
+                      showProfessionalAlert(
+                        context,
+                        title: 'Akun sudah ada',
+                        message:
+                            'Username ini sudah terdaftar. Gunakan username lain atau masuk dengan akun tersebut.',
+                      );
+                    }
                   }
                 },
                 child: AnimatedScale(
