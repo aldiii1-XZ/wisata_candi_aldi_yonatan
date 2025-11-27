@@ -84,7 +84,8 @@ class _SignInScreenState extends State<SignInScreen> {
               ElevatedButton(
                 onPressed: () {
                   // Validasi sederhana, bisa ditambah sesuai kebutuhan
-                  if (_usernameController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+                  if (_usernameController.text.isNotEmpty &&
+                      _passwordController.text.isNotEmpty) {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -93,7 +94,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Isi username dan password!')),
+                      const SnackBar(
+                          content: Text('Isi username dan password!')),
                     );
                   }
                 },
