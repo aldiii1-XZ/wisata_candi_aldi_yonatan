@@ -2,6 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'home_screen.dart';
 
+const List<String> kCandiRecommendations = [
+  'Candi Borobudur',
+  'Candi Prambanan',
+  'Candi Sewu',
+  'Candi Mendut',
+  'Candi Plaosan',
+  'Candi Kalasan',
+  'Candi Ijo',
+];
+
 void main() {
   runApp(const MyApp());
 }
@@ -43,7 +53,8 @@ Future<void> showProfessionalAlert(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(18)),
               ),
               child: Row(
                 children: [
@@ -113,6 +124,69 @@ Future<void> showProfessionalAlert(
   );
 }
 
+class DestinationSearchDelegate extends SearchDelegate<String> {
+  DestinationSearchDelegate(this.items);
+
+  final List<String> items;
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            query = '';
+            showSuggestions(context);
+          },
+        ),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back_ios_new_rounded),
+      onPressed: () => close(context, ''),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return _buildList();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return _buildList();
+  }
+
+  Widget _buildList() {
+    final lower = query.toLowerCase();
+    final List<String> matches =
+        items.where((item) => item.toLowerCase().contains(lower)).toList();
+
+    if (matches.isEmpty) {
+      return const Center(child: Text('Tidak ada hasil'));
+    }
+
+    return ListView.separated(
+      itemCount: matches.length,
+      separatorBuilder: (_, __) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final item = matches[index];
+        return ListTile(
+          leading:
+              const Icon(Icons.location_on_outlined, color: Colors.blueAccent),
+          title: Text(item),
+          subtitle: const Text('Cari info candi terkait'),
+          onTap: () => close(context, item),
+        );
+      },
+    );
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -146,6 +220,53 @@ class _SignInScreenState extends State<SignInScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   double _scaleSignIn = 1.0;
+  int _navIndex = 1; // default to Home tab
+
+  Future<void> _openSearch() async {
+    final result = await showSearch<String>(
+      context: context,
+      delegate: DestinationSearchDelegate(kCandiRecommendations),
+    );
+
+    if (!mounted || result == null || result.isEmpty) return;
+
+    showProfessionalAlert(
+      context,
+      title: 'Destinasi dipilih',
+      message: 'Anda memilih $result. Mulai jelajahi informasi lebih lanjut.',
+      isSuccess: true,
+    );
+  }
+
+  void _onNavTap(int index) {
+    setState(() => _navIndex = index);
+    switch (index) {
+      case 0:
+        _openSearch();
+        break;
+      case 1:
+        showProfessionalAlert(
+          context,
+          title: 'Beranda',
+          message: 'Masuk terlebih dahulu untuk melihat beranda utama.',
+        );
+        break;
+      case 2:
+        showProfessionalAlert(
+          context,
+          title: 'Favorit kosong',
+          message: 'Tambahkan destinasi favorit setelah kamu login.',
+        );
+        break;
+      case 3:
+        showProfessionalAlert(
+          context,
+          title: 'Profil',
+          message: 'Masuk untuk mengelola akun dan profil kamu.',
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +274,38 @@ class _SignInScreenState extends State<SignInScreen> {
       appBar: AppBar(
         title: const Text("Sign In"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search_rounded),
+            onPressed: _openSearch,
+            tooltip: 'Cari candi',
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _navIndex,
+        onTap: _onNavTap,
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.blueGrey,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search_outlined),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_outline),
+            label: 'Favorit',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Akun',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -284,6 +437,53 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _obscurePassword = true;
   double _scaleSignUp = 1.0;
+  int _navIndex = 1; // default to Home tab
+
+  Future<void> _openSearch() async {
+    final result = await showSearch<String>(
+      context: context,
+      delegate: DestinationSearchDelegate(kCandiRecommendations),
+    );
+
+    if (!mounted || result == null || result.isEmpty) return;
+
+    showProfessionalAlert(
+      context,
+      title: 'Referensi ditemukan',
+      message: 'Gunakan $result sebagai inspirasi kunjungan berikutnya.',
+      isSuccess: true,
+    );
+  }
+
+  void _onNavTap(int index) {
+    setState(() => _navIndex = index);
+    switch (index) {
+      case 0:
+        _openSearch();
+        break;
+      case 1:
+        showProfessionalAlert(
+          context,
+          title: 'Beranda',
+          message: 'Selesaikan pendaftaran untuk menuju beranda.',
+        );
+        break;
+      case 2:
+        showProfessionalAlert(
+          context,
+          title: 'Favorit kosong',
+          message: 'Tambahkan destinasi favorit setelah akun dibuat.',
+        );
+        break;
+      case 3:
+        showProfessionalAlert(
+          context,
+          title: 'Profil',
+          message: 'Akun akan siap setelah pendaftaran selesai.',
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,6 +491,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
       appBar: AppBar(
         title: const Text("Sign Up"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search_rounded),
+            onPressed: _openSearch,
+            tooltip: 'Cari candi',
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _navIndex,
+        onTap: _onNavTap,
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.blueGrey,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search_outlined),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite_outline),
+            label: 'Favorit',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Akun',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
