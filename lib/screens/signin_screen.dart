@@ -219,8 +219,31 @@ class _SignInScreenState extends State<SignInScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isSignInReady = false;
   double _scaleSignIn = 1.0;
   int _navIndex = 1; // default to Home tab
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController.addListener(_updateSignInReady);
+    _passwordController.addListener(_updateSignInReady);
+  }
+
+  void _updateSignInReady() {
+    final isReady = _usernameController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty;
+    if (isReady != _isSignInReady) {
+      setState(() => _isSignInReady = isReady);
+    }
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _openSearch() async {
     final result = await showSearch<String>(
@@ -347,8 +370,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 onTapUp: (_) => setState(() => _scaleSignIn = 1.0),
                 onTapCancel: () => setState(() => _scaleSignIn = 1.0),
                 onTap: () {
-                  if (_usernameController.text.isNotEmpty &&
-                      _passwordController.text.isNotEmpty) {
+                  if (_isSignInReady) {
                     Navigator.of(context).pushReplacement(
                       PageRouteBuilder(
                         pageBuilder: (context, animation, secondaryAnimation) =>
@@ -376,6 +398,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _isSignInReady ? Colors.blueAccent : Colors.grey,
+                        foregroundColor: Colors.white,
+                        elevation: _isSignInReady ? 2 : 0,
+                      ),
                       onPressed: null,
                       child: const Text("Sign In"),
                     ),
@@ -436,8 +464,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isSignUpReady = false;
   double _scaleSignUp = 1.0;
   int _navIndex = 1; // default to Home tab
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_updateSignUpReady);
+    _usernameController.addListener(_updateSignUpReady);
+    _passwordController.addListener(_updateSignUpReady);
+  }
+
+  void _updateSignUpReady() {
+    final isReady = _nameController.text.isNotEmpty &&
+        _usernameController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty;
+    if (isReady != _isSignUpReady) {
+      setState(() => _isSignUpReady = isReady);
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _openSearch() async {
     final result = await showSearch<String>(
@@ -570,9 +624,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 onTapUp: (_) => setState(() => _scaleSignUp = 1.0),
                 onTapCancel: () => setState(() => _scaleSignUp = 1.0),
                 onTap: () {
-                  if (_nameController.text.isEmpty ||
-                      _usernameController.text.isEmpty ||
-                      _passwordController.text.isEmpty) {
+                  if (!_isSignUpReady) {
                     showProfessionalAlert(
                       context,
                       title: 'Data belum lengkap',
@@ -596,6 +648,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            _isSignUpReady ? Colors.blueAccent : Colors.grey,
+                        foregroundColor: Colors.white,
+                        elevation: _isSignUpReady ? 2 : 0,
+                      ),
                       onPressed: null,
                       child: const Text("Sign Up"),
                     ),
