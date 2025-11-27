@@ -32,16 +32,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         itemBuilder: (context, index) {
           final Candi candi = candiList[index];
-          return ItemCard(
-            candi: candi,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => DetailScreen(candi: candi),
+          return TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0, end: 1),
+            duration: Duration(milliseconds: 500 + index * 100),
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, (1 - value) * 40),
+                  child: child,
                 ),
               );
             },
+            child: ItemCard(
+              candi: candi,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DetailScreen(candi: candi),
+                  ),
+                );
+              },
+            ),
           );
         },
       ),
