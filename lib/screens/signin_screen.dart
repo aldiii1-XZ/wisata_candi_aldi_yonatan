@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:wisata_candi_aldi_yonatan/services/auth_service.dart';
+import '../data/candi_data.dart';
 import 'home_screen.dart';
 
 const List<String> kCandiRecommendations = [
@@ -222,7 +223,6 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _obscurePassword = true;
   bool _isSignInReady = false;
   double _scaleSignIn = 1.0;
-  int _navIndex = 1; // default to Home tab
 
   @override
   void initState() {
@@ -262,36 +262,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  void _onNavTap(int index) {
-    setState(() => _navIndex = index);
-    switch (index) {
-      case 0:
-        _openSearch();
-        break;
-      case 1:
-        showProfessionalAlert(
-          context,
-          title: 'Beranda',
-          message: 'Masuk terlebih dahulu untuk melihat beranda utama.',
-        );
-        break;
-      case 2:
-        showProfessionalAlert(
-          context,
-          title: 'Favorit kosong',
-          message: 'Tambahkan destinasi favorit setelah kamu login.',
-        );
-        break;
-      case 3:
-        showProfessionalAlert(
-          context,
-          title: 'Profil',
-          message: 'Masuk untuk mengelola akun dan profil kamu.',
-        );
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -303,31 +273,6 @@ class _SignInScreenState extends State<SignInScreen> {
             icon: const Icon(Icons.search_rounded),
             onPressed: _openSearch,
             tooltip: 'Cari candi',
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _navIndex,
-        onTap: _onNavTap,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.blueGrey,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search_outlined),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            label: 'Favorit',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Akun',
           ),
         ],
       ),
@@ -393,7 +338,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     return;
                   }
 
-                  if (!AuthService.instance.validate(username, password)) {
+                  final signedIn = AuthService.instance
+                      .signIn(username: username, password: password);
+                  if (!signedIn) {
                     showProfessionalAlert(
                       context,
                       title: 'Kredensial salah',
@@ -401,6 +348,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     );
                     return;
                   }
+
+                  // Refresh favorite flags with user data before navigating.
+                  AuthService.instance.syncFavorites(candiList);
 
                   Navigator.of(context).pushReplacement(
                     PageRouteBuilder(
@@ -433,6 +383,30 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
               ),
               const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.login_rounded),
+                  label: const Text('Lanjut sebagai Tamu'),
+                  onPressed: () {
+                    AuthService.instance.signOut();
+                    AuthService.instance.syncFavorites(candiList);
+                    Navigator.of(context).pushReplacement(
+                      PageRouteBuilder(
+                        pageBuilder:
+                            (context, animation, secondaryAnimation) =>
+                                const HomeScreen(),
+                        transitionsBuilder: (context, animation,
+                            secondaryAnimation, child) {
+                          return FadeTransition(
+                              opacity: animation, child: child);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 10),
               RichText(
                 text: TextSpan(
                   text: "Belum punya akun? ",

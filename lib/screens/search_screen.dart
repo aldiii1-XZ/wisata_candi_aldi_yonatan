@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/candi.dart';
 import '../data/candi_data.dart';
+import '../services/auth_service.dart';
+import '/screens/favorites_screen.dart';
 import '/screens/home_screen.dart';
 import '/screens/profile_screen.dart';
 
@@ -42,11 +44,9 @@ class _SearchScreenState extends State<SearchScreen> {
         );
         break;
       case 2:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content:
-                Text('Favorit akan tersedia setelah fitur ini diaktifkan.'),
-          ),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoritesScreen()),
         );
         break;
       case 3:
@@ -150,8 +150,19 @@ class _SearchScreenState extends State<SearchScreen> {
                             : Colors.grey.shade600,
                       ),
                       onPressed: () {
+                        if (!AuthService.instance.isSignedIn) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  'Masuk terlebih dahulu untuk menyimpan favorit.'),
+                            ),
+                          );
+                          return;
+                        }
+                        final nowFavorite =
+                            AuthService.instance.toggleFavorite(candi.name);
                         setState(() {
-                          candi.isFavorite = !candi.isFavorite;
+                          candi.isFavorite = nowFavorite;
                         });
                       },
                     ),

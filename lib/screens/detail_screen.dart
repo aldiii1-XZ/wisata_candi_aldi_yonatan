@@ -3,6 +3,7 @@ import '/models/candi.dart';
 import '/widgets/detail_gallery.dart';
 import '/widgets/detail_header.dart';
 import '/widgets/detail_info.dart';
+import '../services/auth_service.dart';
 
 class DetailScreen extends StatefulWidget {
   final Candi candi;
@@ -45,9 +46,19 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   void toggleFavorite() {
+    if (!AuthService.instance.isSignedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Masuk terlebih dahulu untuk menambahkan favorit.'),
+        ),
+      );
+      return;
+    }
+    final nowFavorite =
+        AuthService.instance.toggleFavorite(widget.candi.name);
     setState(() {
-      isFavorite = !isFavorite;
-      widget.candi.isFavorite = isFavorite;
+      isFavorite = nowFavorite;
+      widget.candi.isFavorite = nowFavorite;
     });
   }
 }

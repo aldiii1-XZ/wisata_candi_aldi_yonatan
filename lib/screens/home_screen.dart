@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '/data/candi_data.dart';
 import '/models/candi.dart';
 import '/screens/detail_screen.dart';
+import '/screens/favorites_screen.dart';
 import '/screens/profile_screen.dart';
 import '/screens/search_screen.dart';
 import '/widgets/item_card.dart';
@@ -187,7 +188,10 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => _navIndex = index);
         break;
       case 2:
-        _showInfo('Favorit', 'Tambahkan candi ke favorit dari halaman detail.');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+        );
         break;
       case 3:
         Navigator.pushReplacement(
