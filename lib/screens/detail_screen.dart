@@ -30,7 +30,9 @@ class _DetailScreenState extends State<DetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DetailHeader(
-              imageUrl: widget.candi.imageUrls.first,
+              imageUrl: widget.candi.imageUrls.isNotEmpty
+                  ? widget.candi.imageUrls.first
+                  : null,
               onBackPressed: () => Navigator.pop(context),
             ),
             DetailInfo(
@@ -54,8 +56,7 @@ class _DetailScreenState extends State<DetailScreen> {
       );
       return;
     }
-    final nowFavorite =
-        AuthService.instance.toggleFavorite(widget.candi.name);
+    final nowFavorite = AuthService.instance.toggleFavorite(widget.candi.name);
     setState(() {
       isFavorite = nowFavorite;
       widget.candi.isFavorite = nowFavorite;

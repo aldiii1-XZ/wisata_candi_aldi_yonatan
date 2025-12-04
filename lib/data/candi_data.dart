@@ -42,7 +42,7 @@ var candiList = [
     type: 'Candi Hindu',
     imageAsset: 'images/prambanan.jpeg',
     imageUrls: [
-      'http://media-cdn.tripadvisor.com/media/photo-o/11/d3/f4/02/main-prambanan-temple.jpg',
+      'https://media-cdn.tripadvisor.com/media/photo-o/11/d3/f4/02/main-prambanan-temple.jpg',
       'https://media-cdn.tripadvisor.com/media/photo-o/11/d3/f3/fb/main-prambanan-temple.jpg',
       'https://media-cdn.tripadvisor.com/media/photo-o/11/cd/21/b5/prambanan-diwaktu-malam.jpg',
       'https://media-cdn.tripadvisor.com/media/photo-o/11/cd/21/a1/prambanan-yang-luas-dan.jpg',
@@ -59,8 +59,8 @@ var candiList = [
     imageAsset: 'images/lumbung.jpeg',
     imageUrls: [
       'https://media-cdn.tripadvisor.com/media/photo-o/28/11/e1/80/lumbung-temple.jpg',
-      'http://media-cdn.tripadvisor.com/media/photo-o/28/11/e1/73/lumbung-temple.jpg',
-      'http://media-cdn.tripadvisor.com/media/photo-o/28/11/e1/21/lumbung-temple.jpg',
+      'https://media-cdn.tripadvisor.com/media/photo-o/28/11/e1/73/lumbung-temple.jpg',
+      'https://media-cdn.tripadvisor.com/media/photo-o/28/11/e1/21/lumbung-temple.jpg',
       'https://media-cdn.tripadvisor.com/media/photo-o/28/11/e1/33/lumbung-temple.jpg',
     ],
     isFavorite: false,
@@ -106,9 +106,9 @@ var candiList = [
     type: 'Candi Buddha',
     imageAsset: 'images/sari.jpeg',
     imageUrls: [
-      'http://media-cdn.tripadvisor.com/media/photo-o/0d/7a/26/27/p-20150104-102350-hdr.jpg',
+      'https://media-cdn.tripadvisor.com/media/photo-o/0d/7a/26/27/p-20150104-102350-hdr.jpg',
       'https://media-cdn.tripadvisor.com/media/photo-o/17/e4/b5/32/komplek-candi-sari.jpg',
-      'http://media-cdn.tripadvisor.com/media/photo-o/13/46/0c/0e/cube.jpg',
+      'https://media-cdn.tripadvisor.com/media/photo-o/13/46/0c/0e/cube.jpg',
       'https://media-cdn.tripadvisor.com/media/photo-o/13/46/09/6d/high-wall.jpg',
     ],
     isFavorite: false,

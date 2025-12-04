@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DetailHeader extends StatelessWidget {
-  final String imageUrl;
+  final String? imageUrl;
   final VoidCallback onBackPressed;
 
   const DetailHeader({
@@ -19,19 +19,15 @@ class DetailHeader extends StatelessWidget {
             bottomLeft: Radius.circular(16),
             bottomRight: Radius.circular(16),
           ),
-          child: Image.network(
-            imageUrl,
-            width: double.infinity,
-            height: 250,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              height: 250,
-              color: Colors.grey[300],
-              child: const Center(
-                child: Icon(Icons.broken_image, size: 80, color: Colors.grey),
-              ),
-            ),
-          ),
+          child: imageUrl == null
+              ? _placeholder()
+              : Image.network(
+                  imageUrl!,
+                  width: double.infinity,
+                  height: 250,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => _placeholder(),
+                ),
         ),
         SafeArea(
           child: Padding(
@@ -48,4 +44,14 @@ class DetailHeader extends StatelessWidget {
       ],
     );
   }
+}
+
+Widget _placeholder() {
+  return Container(
+    height: 250,
+    color: Colors.grey[300],
+    child: const Center(
+      child: Icon(Icons.broken_image, size: 80, color: Colors.grey),
+    ),
+  );
 }

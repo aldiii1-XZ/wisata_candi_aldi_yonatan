@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '/screens/home_screen.dart';
@@ -9,6 +7,7 @@ import '../services/auth_service.dart';
 import 'signin_screen.dart';
 import '../data/candi_data.dart';
 import '/screens/favorites_screen.dart';
+import '../utils/profile_photo_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -30,7 +29,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void signOut() {
     AuthService.instance.signOut();
     AuthService.instance.syncFavorites(candiList);
-    setState(() {});
+    setState(() {
+      _profileImagePath = null;
+    });
   }
 
   void _onNavTap(int index) {
@@ -65,9 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final auth = AuthService.instance;
     final user = auth.currentUser;
     final isSignedIn = auth.isSignedIn;
-    final imageProvider = _profileImagePath != null
-        ? FileImage(File(_profileImagePath!)) as ImageProvider
-        : const AssetImage('images/placeholder_image.png');
+    final imageProvider = buildProfileImageProvider(_profileImagePath);
 
     return Scaffold(
       appBar: AppBar(
@@ -146,7 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -155,7 +154,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Row(
                       children: [
                         Icon(
-                          isSignedIn ? Icons.verified_user : Icons.person_outline,
+                          isSignedIn
+                              ? Icons.verified_user
+                              : Icons.person_outline,
                           color: isSignedIn ? Colors.deepPurple : Colors.grey,
                         ),
                         const SizedBox(width: 10),
@@ -268,12 +269,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked == null) return;
+    try {
+      final picked = await picker.pickImage(source: ImageSource.gallery);
+      if (picked == null) return;
 
-    auth.updatePhoto(picked.path);
-    setState(() {
-      _profileImagePath = picked.path;
-    });
+      auth.updatePhoto(picked.path);
+      if (!mounted) return;
+      setState(() {
+        _profileImagePath = picked.path;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gagal mengambil foto. Periksa izin galeri Anda.'),
+        ),
+      );
+    }
   }
 }
