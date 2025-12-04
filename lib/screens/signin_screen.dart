@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
 import 'package:wisata_candi_aldi_yonatan/services/auth_service.dart';
 import '../data/candi_data.dart';
 import 'home_screen.dart';
@@ -38,7 +37,7 @@ Future<void> showProfessionalAlert(
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: accent.withOpacity(0.25),
+              color: accent.withValues(alpha: 0.25),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -51,7 +50,7 @@ Future<void> showProfessionalAlert(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [accent, accent.withOpacity(0.85)],
+                  colors: [accent, accent.withValues(alpha: 0.85)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -63,7 +62,7 @@ Future<void> showProfessionalAlert(
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -264,10 +263,13 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sign In"),
-        centerTitle: true,
+        title: const Text(
+          "Masuk",
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
@@ -276,171 +278,249 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: "Nama Pengguna",
-                  border: OutlineInputBorder(),
-                ),
+      body: Stack(
+        children: [
+          Container(
+            height: 240,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  scheme.primary.withValues(alpha: 0.18),
+                  scheme.secondary.withValues(alpha: 0.12),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: "Kata Sandi",
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword
-                        ? Icons.visibility_off
-                        : Icons.visibility),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              GestureDetector(
-                onTapDown: (_) => setState(() => _scaleSignIn = 0.95),
-                onTapUp: (_) => setState(() => _scaleSignIn = 1.0),
-                onTapCancel: () => setState(() => _scaleSignIn = 1.0),
-                onTap: () {
-                  if (!_isSignInReady) {
-                    showProfessionalAlert(
-                      context,
-                      title: 'Data belum lengkap',
-                      message:
-                          'Masukkan username dan kata sandi terlebih dahulu untuk melanjutkan.',
-                    );
-                    return;
-                  }
-                  final username = _usernameController.text;
-                  final password = _passwordController.text;
-
-                  if (!AuthService.instance.userExists(username)) {
-                    showProfessionalAlert(
-                      context,
-                      title: 'Akun belum terdaftar',
-                      message:
-                          'Buat akun terlebih dahulu melalui halaman Sign Up sebelum masuk.',
-                    );
-                    return;
-                  }
-
-                  final signedIn = AuthService.instance
-                      .signIn(username: username, password: password);
-                  if (!signedIn) {
-                    showProfessionalAlert(
-                      context,
-                      title: 'Kredensial salah',
-                      message: 'Periksa kembali username dan kata sandi kamu.',
-                    );
-                    return;
-                  }
-
-                  // Refresh favorite flags with user data before navigating.
-                  AuthService.instance.syncFavorites(candiList);
-
-                  Navigator.of(context).pushReplacement(
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const HomeScreen(),
-                      transitionsBuilder:
-                          (context, animation, secondaryAnimation, child) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                    ),
-                  );
-                },
-                child: AnimatedScale(
-                  scale: _scaleSignIn,
-                  duration: const Duration(milliseconds: 100),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isSignInReady ? Colors.blueAccent : Colors.grey,
-                        foregroundColor: Colors.white,
-                        elevation: _isSignInReady ? 2 : 0,
-                      ),
-                      onPressed: null,
-                      child: const Text("Sign In"),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.login_rounded),
-                  label: const Text('Lanjut sebagai Tamu'),
-                  onPressed: () {
-                    AuthService.instance.signOut();
-                    AuthService.instance.syncFavorites(candiList);
-                    Navigator.of(context).pushReplacement(
-                      PageRouteBuilder(
-                        pageBuilder:
-                            (context, animation, secondaryAnimation) =>
-                                const HomeScreen(),
-                        transitionsBuilder: (context, animation,
-                            secondaryAnimation, child) {
-                          return FadeTransition(
-                              opacity: animation, child: child);
-                        },
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 10),
-              RichText(
-                text: TextSpan(
-                  text: "Belum punya akun? ",
-                  style: const TextStyle(color: Colors.black87),
+            ),
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    WidgetSpan(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const SignUpScreen(),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                    opacity: animation, child: child);
-                              },
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                backgroundColor:
+                                    scheme.primary.withValues(alpha: 0.12),
+                                child: const Icon(Icons.spa,
+                                    color: Colors.deepPurple),
+                              ),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    "Wisata Candi",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w800),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Masuk untuk simpan favorit & profil",
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.black54),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          TextFormField(
+                            controller: _usernameController,
+                            decoration: const InputDecoration(
+                              labelText: "Nama Pengguna",
+                              prefixIcon: Icon(Icons.person_outline),
                             ),
-                          );
-                        },
-                        child: Text(
-                          "Sign Up",
-                          style: const TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 14),
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            decoration: InputDecoration(
+                              labelText: "Kata Sandi",
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                icon: Icon(_obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          GestureDetector(
+                            onTapDown: (_) =>
+                                setState(() => _scaleSignIn = 0.95),
+                            onTapUp: (_) => setState(() => _scaleSignIn = 1.0),
+                            onTapCancel: () =>
+                                setState(() => _scaleSignIn = 1.0),
+                            onTap: _handleSignIn,
+                            child: AnimatedScale(
+                              scale: _scaleSignIn,
+                              duration: const Duration(milliseconds: 100),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _isSignInReady
+                                        ? scheme.primary
+                                        : Colors.grey.shade400,
+                                    foregroundColor: Colors.white,
+                                    elevation: _isSignInReady ? 2 : 0,
+                                  ),
+                                  onPressed: null,
+                                  child: const Text("Masuk"),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.travel_explore),
+                            label: const Text('Lanjut sebagai Tamu'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: scheme.primary,
+                              side: BorderSide(
+                                  color: scheme.primary.withValues(alpha: 0.4)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            onPressed: _continueAsGuest,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Belum punya akun? ",
+                          style: const TextStyle(color: Colors.black87),
+                          children: [
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: GestureDetector(
+                                onTap: _goToSignUp,
+                                child: Text(
+                                  "Daftar sekarang",
+                                  style: TextStyle(
+                                    color: scheme.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  void _handleSignIn() {
+    if (!_isSignInReady) {
+      showProfessionalAlert(
+        context,
+        title: 'Data belum lengkap',
+        message:
+            'Masukkan username dan kata sandi terlebih dahulu untuk melanjutkan.',
+      );
+      return;
+    }
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+
+    if (!AuthService.instance.userExists(username)) {
+      showProfessionalAlert(
+        context,
+        title: 'Akun belum terdaftar',
+        message:
+            'Buat akun terlebih dahulu melalui halaman Sign Up sebelum masuk.',
+      );
+      return;
+    }
+
+    final signedIn =
+        AuthService.instance.signIn(username: username, password: password);
+    if (!signedIn) {
+      showProfessionalAlert(
+        context,
+        title: 'Kredensial salah',
+        message: 'Periksa kembali username dan kata sandi kamu.',
+      );
+      return;
+    }
+
+    // Refresh favorite flags with user data before navigating.
+    AuthService.instance.syncFavorites(candiList);
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const HomeScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
+  void _continueAsGuest() {
+    AuthService.instance.signOut();
+    AuthService.instance.syncFavorites(candiList);
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const HomeScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
+  void _goToSignUp() {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const SignUpScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       ),
     );
   }
@@ -537,10 +617,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sign Up"),
-        centerTitle: true,
+        title: const Text(
+          "Daftar Akun",
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
@@ -552,8 +635,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _navIndex,
         onTap: _onNavTap,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.blueGrey,
+        selectedItemColor: scheme.primary,
+        unselectedItemColor: scheme.primary.withValues(alpha: 0.4),
         showUnselectedLabels: true,
         items: const [
           BottomNavigationBarItem(
@@ -574,107 +657,164 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: "Nama",
-                  border: OutlineInputBorder(),
-                ),
+      body: Stack(
+        children: [
+          Container(
+            height: 200,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  scheme.primary.withValues(alpha: 0.14),
+                  scheme.secondary.withValues(alpha: 0.12),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: "Nama Pengguna",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: "Kata Sandi",
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscurePassword
-                        ? Icons.visibility_off
-                        : Icons.visibility),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              GestureDetector(
-                onTapDown: (_) => setState(() => _scaleSignUp = 0.95),
-                onTapUp: (_) => setState(() => _scaleSignUp = 1.0),
-                onTapCancel: () => setState(() => _scaleSignUp = 1.0),
-                onTap: () {
-                  if (!_isSignUpReady) {
-                    showProfessionalAlert(
-                      context,
-                      title: 'Data belum lengkap',
-                      message:
-                          'Pastikan nama, username, dan kata sandi terisi sebelum melanjutkan.',
-                    );
-                    return;
-                  } else {
-                    final registered = AuthService.instance.register(
-                      username: _usernameController.text,
-                      password: _passwordController.text,
-                      fullName: _nameController.text,
-                    );
-                    if (registered) {
-                      showProfessionalAlert(
-                        context,
-                        title: 'Pendaftaran berhasil',
-                        message:
-                            'Akun sudah dibuat. Silakan kembali ke halaman Sign In untuk masuk.',
-                        isSuccess: true,
-                      );
-                    } else {
-                      showProfessionalAlert(
-                        context,
-                        title: 'Akun sudah ada',
-                        message:
-                            'Username ini sudah terdaftar. Gunakan username lain atau masuk dengan akun tersebut.',
-                      );
-                    }
-                  }
-                },
-                child: AnimatedScale(
-                  scale: _scaleSignUp,
-                  duration: const Duration(milliseconds: 100),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isSignUpReady ? Colors.blueAccent : Colors.grey,
-                        foregroundColor: Colors.white,
-                        elevation: _isSignUpReady ? 2 : 0,
-                      ),
-                      onPressed: null,
-                      child: const Text("Sign Up"),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.05),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              children: [
+                                Icon(Icons.rocket_launch,
+                                    color: scheme.primary),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  "Buat akun baru",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 18),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: _nameController,
+                            decoration: const InputDecoration(
+                              labelText: "Nama",
+                              prefixIcon: Icon(Icons.badge_outlined),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          TextFormField(
+                            controller: _usernameController,
+                            decoration: const InputDecoration(
+                              labelText: "Nama Pengguna",
+                              prefixIcon: Icon(Icons.person_outline),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            decoration: InputDecoration(
+                              labelText: "Kata Sandi",
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                icon: Icon(_obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          GestureDetector(
+                            onTapDown: (_) =>
+                                setState(() => _scaleSignUp = 0.95),
+                            onTapUp: (_) => setState(() => _scaleSignUp = 1.0),
+                            onTapCancel: () =>
+                                setState(() => _scaleSignUp = 1.0),
+                            onTap: _handleSignUp,
+                            child: AnimatedScale(
+                              scale: _scaleSignUp,
+                              duration: const Duration(milliseconds: 100),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _isSignUpReady
+                                        ? scheme.primary
+                                        : Colors.grey.shade400,
+                                    foregroundColor: Colors.white,
+                                    elevation: _isSignUpReady ? 2 : 0,
+                                  ),
+                                  onPressed: null,
+                                  child: const Text("Daftar"),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  void _handleSignUp() {
+    if (!_isSignUpReady) {
+      showProfessionalAlert(
+        context,
+        title: 'Data belum lengkap',
+        message:
+            'Pastikan nama, username, dan kata sandi terisi sebelum melanjutkan.',
+      );
+      return;
+    }
+    final registered = AuthService.instance.register(
+      username: _usernameController.text,
+      password: _passwordController.text,
+      fullName: _nameController.text,
+    );
+    if (registered) {
+      showProfessionalAlert(
+        context,
+        title: 'Pendaftaran berhasil',
+        message:
+            'Akun sudah dibuat. Silakan kembali ke halaman Sign In untuk masuk.',
+        isSuccess: true,
+      );
+    } else {
+      showProfessionalAlert(
+        context,
+        title: 'Akun sudah ada',
+        message:
+            'Username ini sudah terdaftar. Gunakan username lain atau masuk dengan akun tersebut.',
+      );
+    }
   }
 }
