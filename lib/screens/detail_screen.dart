@@ -56,10 +56,14 @@ class _DetailScreenState extends State<DetailScreen> {
       );
       return;
     }
-    final nowFavorite = AuthService.instance.toggleFavorite(widget.candi.name);
-    setState(() {
-      isFavorite = nowFavorite;
-      widget.candi.isFavorite = nowFavorite;
+    AuthService.instance
+        .toggleFavorite(widget.candi.name)
+        .then((nowFavorite) {
+      if (!mounted) return;
+      setState(() {
+        isFavorite = nowFavorite;
+        widget.candi.isFavorite = nowFavorite;
+      });
     });
   }
 }

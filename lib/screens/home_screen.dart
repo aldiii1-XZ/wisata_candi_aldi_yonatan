@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [accent, accent.withOpacity(0.85)],
+                  colors: [accent, accent.withValues(alpha: 0.85)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

@@ -26,8 +26,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _profileImagePath = AuthService.instance.photoPath;
   }
 
-  void signOut() {
-    AuthService.instance.signOut();
+  Future<void> signOut() async {
+    await AuthService.instance.signOut();
     AuthService.instance.syncFavorites(candiList);
     setState(() {
       _profileImagePath = null;
@@ -225,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         foregroundColor: Colors.white,
                       ),
                       onPressed: isSignedIn
-                          ? signOut
+                          ? () => signOut()
                           : () {
                               Navigator.pushReplacement(
                                 context,
@@ -277,7 +277,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final picked = await picker.pickImage(source: source);
       if (picked == null) return;
 
-      auth.updatePhoto(picked.path);
+      await auth.updatePhoto(picked.path);
       if (!mounted) return;
       setState(() {
         _profileImagePath = picked.path;

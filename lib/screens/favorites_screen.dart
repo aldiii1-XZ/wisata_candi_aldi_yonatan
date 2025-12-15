@@ -105,10 +105,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       return _FavoriteTile(
                         candi: candi,
                         onRemove: () {
-                          final nowFavorite =
-                              AuthService.instance.toggleFavorite(candi.name);
-                          setState(() {
-                            candi.isFavorite = nowFavorite;
+                          AuthService.instance
+                              .toggleFavorite(candi.name)
+                              .then((nowFavorite) {
+                            setState(() {
+                              candi.isFavorite = nowFavorite;
+                            });
                           });
                         },
                         onOpen: () {

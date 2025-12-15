@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import '/screens/signin_screen.dart';
+import '/services/auth_service.dart';
+import '/data/candi_data.dart';
 
 const _brandPurple = Color(0xFF5A2D82);
 const _brandOrange = Color(0xFFFF8A5C);
 const _surface = Color(0xFFF6F4FB);
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthService.instance.init();
+  AuthService.instance.syncFavorites(candiList);
   runApp(const MyApp());
 }
 

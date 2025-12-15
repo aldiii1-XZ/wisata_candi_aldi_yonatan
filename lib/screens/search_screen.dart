@@ -159,10 +159,12 @@ class _SearchScreenState extends State<SearchScreen> {
                           );
                           return;
                         }
-                        final nowFavorite =
-                            AuthService.instance.toggleFavorite(candi.name);
-                        setState(() {
-                          candi.isFavorite = nowFavorite;
+                        AuthService.instance
+                            .toggleFavorite(candi.name)
+                            .then((nowFavorite) {
+                          setState(() {
+                            candi.isFavorite = nowFavorite;
+                          });
                         });
                       },
                     ),

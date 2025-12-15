@@ -405,19 +405,20 @@ class _SignInScreenState extends State<SignInScreen>
                                       borderRadius: BorderRadius.circular(14),
                                     ),
                                   ).copyWith(
-                                    backgroundColor: MaterialStateProperty
+                                    backgroundColor: WidgetStateProperty
                                         .resolveWith<Color?>(
                                       (states) {
-                                        if (states.contains(
-                                            MaterialState.disabled)) {
+                                        if (states
+                                            .contains(WidgetState.disabled)) {
                                           return Colors.grey.shade400;
                                         }
                                         return scheme.primary;
                                       },
                                     ),
                                   ),
-                                  onPressed:
-                                      _isSignInReady ? _handleSignIn : null,
+                                  onPressed: _isSignInReady
+                                      ? () => _handleSignIn()
+                                      : null,
                                   child: const Text("Masuk"),
                                 ),
                               ),
@@ -434,9 +435,9 @@ class _SignInScreenState extends State<SignInScreen>
                                       const EdgeInsets.symmetric(vertical: 12),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
+                                    ),
                                   ),
-                                ),
-                                onPressed: _continueAsGuest,
+                                onPressed: () => _continueAsGuest(),
                               ),
                             ],
                           ),
@@ -477,7 +478,7 @@ class _SignInScreenState extends State<SignInScreen>
     );
   }
 
-  void _handleSignIn() {
+  Future<void> _handleSignIn() async {
     if (!_isSignInReady) {
       showProfessionalAlert(
         context,
@@ -500,8 +501,8 @@ class _SignInScreenState extends State<SignInScreen>
       return;
     }
 
-    final signedIn =
-        AuthService.instance.signIn(username: username, password: password);
+    final signedIn = await AuthService.instance
+        .signIn(username: username, password: password);
     if (!signedIn) {
       showProfessionalAlert(
         context,
@@ -525,8 +526,8 @@ class _SignInScreenState extends State<SignInScreen>
     );
   }
 
-  void _continueAsGuest() {
-    AuthService.instance.signOut();
+  Future<void> _continueAsGuest() async {
+    await AuthService.instance.signOut();
     AuthService.instance.syncFavorites(candiList);
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -801,19 +802,20 @@ class _SignUpScreenState extends State<SignUpScreen>
                                       borderRadius: BorderRadius.circular(14),
                                     ),
                                   ).copyWith(
-                                    backgroundColor: MaterialStateProperty
+                                    backgroundColor: WidgetStateProperty
                                         .resolveWith<Color?>(
                                       (states) {
                                         if (states.contains(
-                                            MaterialState.disabled)) {
+                                            WidgetState.disabled)) {
                                           return Colors.grey.shade400;
                                         }
                                         return scheme.primary;
                                       },
                                     ),
                                   ),
-                                  onPressed:
-                                      _isSignUpReady ? _handleSignUp : null,
+                                  onPressed: _isSignUpReady
+                                      ? () => _handleSignUp()
+                                      : null,
                                   child: const Text("Daftar"),
                                 ),
                               ),
@@ -832,7 +834,7 @@ class _SignUpScreenState extends State<SignUpScreen>
     );
   }
 
-  void _handleSignUp() {
+  Future<void> _handleSignUp() async {
     if (!_isSignUpReady) {
       showProfessionalAlert(
         context,
@@ -842,7 +844,7 @@ class _SignUpScreenState extends State<SignUpScreen>
       );
       return;
     }
-    final registered = AuthService.instance.register(
+    final registered = await AuthService.instance.register(
       username: _usernameController.text,
       password: _passwordController.text,
       fullName: _nameController.text,
