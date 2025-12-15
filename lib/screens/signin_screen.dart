@@ -221,7 +221,6 @@ class _SignInScreenState extends State<SignInScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isSignInReady = false;
-  double _scaleSignIn = 1.0;
 
   @override
   void initState() {
@@ -373,30 +372,23 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ),
                           const SizedBox(height: 18),
-                          GestureDetector(
-                            onTapDown: (_) =>
-                                setState(() => _scaleSignIn = 0.95),
-                            onTapUp: (_) => setState(() => _scaleSignIn = 1.0),
-                            onTapCancel: () =>
-                                setState(() => _scaleSignIn = 1.0),
-                            onTap: _handleSignIn,
-                            child: AnimatedScale(
-                              scale: _scaleSignIn,
-                              duration: const Duration(milliseconds: 100),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: _isSignInReady
-                                        ? scheme.primary
-                                        : Colors.grey.shade400,
-                                    foregroundColor: Colors.white,
-                                    elevation: _isSignInReady ? 2 : 0,
-                                  ),
-                                  onPressed: null,
-                                  child: const Text("Masuk"),
-                                ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: _isSignInReady ? 2 : 0,
+                                foregroundColor: Colors.white,
+                                backgroundColor: MaterialStateProperty
+                                    .resolveWith((states) {
+                                  if (states.contains(MaterialState.disabled)) {
+                                    return Colors.grey.shade400;
+                                  }
+                                  return scheme.primary;
+                                }),
                               ),
+                              onPressed:
+                                  _isSignInReady ? _handleSignIn : null,
+                              child: const Text("Masuk"),
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -541,7 +533,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _obscurePassword = true;
   bool _isSignUpReady = false;
-  double _scaleSignUp = 1.0;
   int _navIndex = 1; // default to Home tab
 
   @override
@@ -746,30 +737,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                           const SizedBox(height: 18),
-                          GestureDetector(
-                            onTapDown: (_) =>
-                                setState(() => _scaleSignUp = 0.95),
-                            onTapUp: (_) => setState(() => _scaleSignUp = 1.0),
-                            onTapCancel: () =>
-                                setState(() => _scaleSignUp = 1.0),
-                            onTap: _handleSignUp,
-                            child: AnimatedScale(
-                              scale: _scaleSignUp,
-                              duration: const Duration(milliseconds: 100),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: _isSignUpReady
-                                        ? scheme.primary
-                                        : Colors.grey.shade400,
-                                    foregroundColor: Colors.white,
-                                    elevation: _isSignUpReady ? 2 : 0,
-                                  ),
-                                  onPressed: null,
-                                  child: const Text("Daftar"),
-                                ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: _isSignUpReady ? 2 : 0,
+                                foregroundColor: Colors.white,
+                                backgroundColor: MaterialStateProperty
+                                    .resolveWith((states) {
+                                  if (states.contains(MaterialState.disabled)) {
+                                    return Colors.grey.shade400;
+                                  }
+                                  return scheme.primary;
+                                }),
                               ),
+                              onPressed:
+                                  _isSignUpReady ? _handleSignUp : null,
+                              child: const Text("Daftar"),
                             ),
                           ),
                         ],

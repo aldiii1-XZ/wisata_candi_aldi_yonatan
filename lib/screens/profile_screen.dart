@@ -268,9 +268,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       return;
     }
+
+    final source = await _selectPhotoSource();
+    if (source == null) return;
+
     final picker = ImagePicker();
     try {
-      final picked = await picker.pickImage(source: ImageSource.gallery);
+      final picked = await picker.pickImage(source: source);
       if (picked == null) return;
 
       auth.updatePhoto(picked.path);
@@ -281,10 +285,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gagal mengambil foto. Periksa izin galeri Anda.'),
+        SnackBar(
+          content: Text(
+            source == ImageSource.camera
+                ? 'Gagal mengambil foto. Periksa izin kamera Anda.'
+                : 'Gagal mengambil foto. Periksa izin galeri Anda.',
+          ),
         ),
       );
     }
+  }
+
+  Future<ImageSource?> _selectPhotoSource() {
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Pilih dari galeri'),
+              onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: const Text('Ambil dengan kamera'),
+              onTap: () => Navigator.pop(ctx, ImageSource.camera),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
   }
 }
