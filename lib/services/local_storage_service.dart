@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {
   LocalStorageService._();
@@ -13,12 +16,16 @@ class LocalStorageService {
   bool _useMemory = false;
   final List<StoredUser> _memoryUsers = [];
   int _memoryId = 1;
+  SharedPreferences? _webPrefs;
+  static const _kWebUsersKey = 'web_users';
 
   Future<void> init() async {
     if (_db != null || _useMemory) return;
     if (kIsWeb) {
-      // sqflite is not available on web; fall back to in-memory store.
+      // sqflite is not available on web; use SharedPreferences-backed store.
       _useMemory = true;
+      _webPrefs = await SharedPreferences.getInstance();
+      await _hydrateWeb();
       return;
     }
     final dbPath = await getDatabasesPath();
@@ -64,6 +71,7 @@ class LocalStorageService {
         favorites: <String>{},
       );
       _memoryUsers.add(user);
+      await _persistWeb();
       return user.id;
     }
     final db = _ensureDb();
@@ -89,6 +97,7 @@ class LocalStorageService {
         _memoryUsers[idx] =
             _memoryUsers[idx].copyWith(photoPath: photoPath);
       }
+      await _persistWeb();
       return;
     }
     final db = _ensureDb();
@@ -166,6 +175,7 @@ class LocalStorageService {
         }
         _memoryUsers[idx] = _memoryUsers[idx].copyWith(favorites: favorites);
       }
+      await _persistWeb();
       return;
     }
     final db = _ensureDb();
@@ -190,6 +200,46 @@ class LocalStorageService {
       throw StateError('LocalStorageService not initialized');
     }
     return db;
+  }
+
+  Future<void> _persistWeb() async {
+    if (!kIsWeb || _webPrefs == null) return;
+    final payload = _memoryUsers
+        .map((u) => {
+              'id': u.id,
+              'username': u.username,
+              'password': u.password,
+              'name': u.name,
+              'photoPath': u.photoPath,
+              'favorites': u.favorites.toList(),
+            })
+        .toList();
+    await _webPrefs!.setString(_kWebUsersKey, jsonEncode(payload));
+  }
+
+  Future<void> _hydrateWeb() async {
+    if (!kIsWeb || _webPrefs == null) return;
+    final raw = _webPrefs!.getString(_kWebUsersKey);
+    if (raw == null || raw.isEmpty) return;
+    try {
+      final data = jsonDecode(raw) as List<dynamic>;
+      for (final row in data) {
+        final map = row as Map<String, dynamic>;
+        final user = StoredUser(
+          id: map['id'] as int,
+          username: map['username'] as String,
+          password: map['password'] as String,
+          name: map['name'] as String?,
+          photoPath: map['photoPath'] as String?,
+          favorites:
+              (map['favorites'] as List<dynamic>).map((e) => '$e').toSet(),
+        );
+        _memoryUsers.add(user);
+        _memoryId = _memoryId < user.id ? user.id + 1 : _memoryId;
+      }
+    } catch (_) {
+      // ignore corrupted payload
+    }
   }
 }
 
