@@ -215,18 +215,31 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignInScreenState extends State<SignInScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _isSignInReady = false;
+  late final AnimationController _bgController;
+  late final Animation<double> _bgAnimation;
+  bool _animateIn = false;
 
   @override
   void initState() {
     super.initState();
     _usernameController.addListener(_updateSignInReady);
     _passwordController.addListener(_updateSignInReady);
+    _bgController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    )..repeat(reverse: true);
+    _bgAnimation =
+        CurvedAnimation(parent: _bgController, curve: Curves.easeInOutCubic);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateIn = true);
+    });
   }
 
   void _updateSignInReady() {
@@ -241,6 +254,7 @@ class _SignInScreenState extends State<SignInScreen> {
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _bgController.dispose();
     super.dispose();
   }
 
@@ -279,18 +293,10 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
       body: Stack(
         children: [
-          Container(
+          _AnimatedLuxuryBackdrop(
             height: 240,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  scheme.primary.withValues(alpha: 0.18),
-                  scheme.secondary.withValues(alpha: 0.12),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
+            scheme: scheme,
+            animation: _bgAnimation,
           ),
           SafeArea(
             child: SingleChildScrollView(
@@ -300,117 +306,141 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor:
-                                    scheme.primary.withValues(alpha: 0.12),
-                                child: const Icon(Icons.spa,
-                                    color: Colors.deepPurple),
+                    AnimatedSlide(
+                      offset: _animateIn ? Offset.zero : const Offset(0, 0.05),
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOutCubic,
+                      child: AnimatedOpacity(
+                        opacity: _animateIn ? 1 : 0,
+                        duration: const Duration(milliseconds: 500),
+                        child: Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 18,
+                                offset: const Offset(0, 10),
                               ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    "Wisata Candi",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w800),
+                            ],
+                            border: Border.all(
+                              color: scheme.primary
+                                  .withValues(alpha: 0.12),
+                              width: 1,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 28,
+                                    backgroundColor:
+                                        scheme.primary.withValues(alpha: 0.1),
+                                    child: const Icon(Icons.spa,
+                                        color: Colors.deepPurple, size: 28),
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "Masuk untuk simpan favorit & profil",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.black54),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: const [
+                                      Text(
+                                        "Wisata Candi",
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w800),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        "Masuk untuk simpan favorit & profil",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black54),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
-                          TextFormField(
-                            controller: _usernameController,
-                            decoration: const InputDecoration(
-                              labelText: "Nama Pengguna",
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              labelText: "Kata Sandi",
-                              prefixIcon: const Icon(Icons.lock_outline),
-                              suffixIcon: IconButton(
-                                icon: Icon(_obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: _isSignInReady ? 2 : 0,
-                                foregroundColor: Colors.white,
-                              ).copyWith(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color?>(
-                                  (states) {
-                                    if (states
-                                        .contains(MaterialState.disabled)) {
-                                      return Colors.grey.shade400;
-                                    }
-                                    return scheme.primary;
-                                  },
+                              const SizedBox(height: 18),
+                              TextFormField(
+                                controller: _usernameController,
+                                decoration: const InputDecoration(
+                                  labelText: "Nama Pengguna",
+                                  prefixIcon: Icon(Icons.person_outline),
                                 ),
                               ),
-                              onPressed:
-                                  _isSignInReady ? _handleSignIn : null,
-                              child: const Text("Masuk"),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          OutlinedButton.icon(
-                            icon: const Icon(Icons.travel_explore),
-                            label: const Text('Lanjut sebagai Tamu'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: scheme.primary,
-                              side: BorderSide(
-                                  color: scheme.primary.withValues(alpha: 0.4)),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
+                              const SizedBox(height: 14),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                decoration: InputDecoration(
+                                  labelText: "Kata Sandi",
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(_obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
+                                ),
                               ),
-                            ),
-                            onPressed: _continueAsGuest,
+                              const SizedBox(height: 18),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: _isSignInReady ? 3 : 0,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ).copyWith(
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color?>(
+                                      (states) {
+                                        if (states.contains(
+                                            MaterialState.disabled)) {
+                                          return Colors.grey.shade400;
+                                        }
+                                        return scheme.primary;
+                                      },
+                                    ),
+                                  ),
+                                  onPressed:
+                                      _isSignInReady ? _handleSignIn : null,
+                                  child: const Text("Masuk"),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                icon: const Icon(Icons.travel_explore),
+                                label: const Text('Lanjut sebagai Tamu'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: scheme.primary,
+                                  side: BorderSide(
+                                      color: scheme.primary
+                                          .withValues(alpha: 0.4)),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                onPressed: _continueAsGuest,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -529,7 +559,8 @@ class SignUpScreen extends StatefulWidget {
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _usernameController = TextEditingController();
@@ -538,6 +569,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _obscurePassword = true;
   bool _isSignUpReady = false;
   int _navIndex = 1; // default to Home tab
+  late final AnimationController _bgController;
+  late final Animation<double> _bgAnimation;
+  bool _animateIn = false;
 
   @override
   void initState() {
@@ -545,6 +579,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _nameController.addListener(_updateSignUpReady);
     _usernameController.addListener(_updateSignUpReady);
     _passwordController.addListener(_updateSignUpReady);
+    _bgController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 12),
+    )..repeat(reverse: true);
+    _bgAnimation =
+        CurvedAnimation(parent: _bgController, curve: Curves.easeInOutCubic);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animateIn = true);
+    });
   }
 
   void _updateSignUpReady() {
@@ -561,6 +604,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _nameController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
+    _bgController.dispose();
     super.dispose();
   }
 
@@ -654,18 +698,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
       body: Stack(
         children: [
-          Container(
-            height: 200,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  scheme.primary.withValues(alpha: 0.14),
-                  scheme.secondary.withValues(alpha: 0.12),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
+          _AnimatedLuxuryBackdrop(
+            height: 220,
+            scheme: scheme,
+            animation: _bgAnimation,
           ),
           SafeArea(
             child: SingleChildScrollView(
@@ -674,97 +710,116 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 16,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Row(
-                              children: [
-                                Icon(Icons.rocket_launch,
-                                    color: scheme.primary),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  "Buat akun baru",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 18),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _nameController,
-                            decoration: const InputDecoration(
-                              labelText: "Nama",
-                              prefixIcon: Icon(Icons.badge_outlined),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          TextFormField(
-                            controller: _usernameController,
-                            decoration: const InputDecoration(
-                              labelText: "Nama Pengguna",
-                              prefixIcon: Icon(Icons.person_outline),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            decoration: InputDecoration(
-                              labelText: "Kata Sandi",
-                              prefixIcon: const Icon(Icons.lock_outline),
-                              suffixIcon: IconButton(
-                                icon: Icon(_obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
+                    AnimatedSlide(
+                      offset: _animateIn ? Offset.zero : const Offset(0, 0.05),
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOutCubic,
+                      child: AnimatedOpacity(
+                        opacity: _animateIn ? 1 : 0,
+                        duration: const Duration(milliseconds: 500),
+                        child: Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.05),
+                                blurRadius: 18,
+                                offset: const Offset(0, 10),
                               ),
+                            ],
+                            border: Border.all(
+                              color: scheme.primary
+                                  .withValues(alpha: 0.12),
+                              width: 1,
                             ),
                           ),
-                          const SizedBox(height: 18),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                elevation: _isSignUpReady ? 2 : 0,
-                                foregroundColor: Colors.white,
-                              ).copyWith(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color?>(
-                                  (states) {
-                                    if (states
-                                        .contains(MaterialState.disabled)) {
-                                      return Colors.grey.shade400;
-                                    }
-                                    return scheme.primary;
-                                  },
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.rocket_launch,
+                                        color: scheme.primary),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Buat akun baru",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 18),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              onPressed:
-                                  _isSignUpReady ? _handleSignUp : null,
-                              child: const Text("Daftar"),
-                            ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: const InputDecoration(
+                                  labelText: "Nama",
+                                  prefixIcon: Icon(Icons.badge_outlined),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              TextFormField(
+                                controller: _usernameController,
+                                decoration: const InputDecoration(
+                                  labelText: "Nama Pengguna",
+                                  prefixIcon: Icon(Icons.person_outline),
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                decoration: InputDecoration(
+                                  labelText: "Kata Sandi",
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(_obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: _isSignUpReady ? 3 : 0,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 14),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                  ).copyWith(
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color?>(
+                                      (states) {
+                                        if (states.contains(
+                                            MaterialState.disabled)) {
+                                          return Colors.grey.shade400;
+                                        }
+                                        return scheme.primary;
+                                      },
+                                    ),
+                                  ),
+                                  onPressed:
+                                      _isSignUpReady ? _handleSignUp : null,
+                                  child: const Text("Daftar"),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
@@ -808,5 +863,96 @@ class _SignUpScreenState extends State<SignUpScreen> {
             'Username ini sudah terdaftar. Gunakan username lain atau masuk dengan akun tersebut.',
       );
     }
+  }
+}
+
+class _AnimatedLuxuryBackdrop extends StatelessWidget {
+  const _AnimatedLuxuryBackdrop({
+    required this.height,
+    required this.scheme,
+    required this.animation,
+  });
+
+  final double height;
+  final ColorScheme scheme;
+  final Animation<double> animation;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (_, __) {
+        final t = animation.value;
+        final begin = const Alignment(-0.8, -1);
+        final end = const Alignment(0.9, 0.6);
+        final glowShift = (t - 0.5) * 30;
+
+        return SizedBox(
+          height: height,
+          width: double.infinity,
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.lerp(
+                          scheme.primary, Colors.indigo.shade900, 0.15)!,
+                      Color.lerp(
+                          scheme.secondary, Colors.pink.shade200, 0.25)!,
+                    ],
+                    begin: Alignment.lerp(begin, end, t)!,
+                    end: Alignment.lerp(const Alignment(1, -0.3),
+                        const Alignment(-0.6, 1), t)!,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 30 + glowShift,
+                left: -20,
+                child: _GlassGlow(
+                  diameter: 160,
+                  color: scheme.primary.withValues(alpha: 0.12),
+                ),
+              ),
+              Positioned(
+                bottom: -10 - glowShift,
+                right: -30,
+                child: _GlassGlow(
+                  diameter: 200,
+                  color: scheme.secondary.withValues(alpha: 0.12),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _GlassGlow extends StatelessWidget {
+  const _GlassGlow({required this.diameter, required this.color});
+
+  final double diameter;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: diameter,
+      height: diameter,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color,
+        boxShadow: [
+          BoxShadow(
+            color: color,
+            blurRadius: 60,
+            spreadRadius: 20,
+          ),
+        ],
+      ),
+    );
   }
 }
