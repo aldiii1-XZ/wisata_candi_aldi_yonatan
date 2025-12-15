@@ -378,13 +378,17 @@ class _SignInScreenState extends State<SignInScreen> {
                               style: ElevatedButton.styleFrom(
                                 elevation: _isSignInReady ? 2 : 0,
                                 foregroundColor: Colors.white,
-                                backgroundColor: MaterialStateProperty
-                                    .resolveWith((states) {
-                                  if (states.contains(MaterialState.disabled)) {
-                                    return Colors.grey.shade400;
-                                  }
-                                  return scheme.primary;
-                                }),
+                              ).copyWith(
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color?>(
+                                  (states) {
+                                    if (states
+                                        .contains(MaterialState.disabled)) {
+                                      return Colors.grey.shade400;
+                                    }
+                                    return scheme.primary;
+                                  },
+                                ),
                               ),
                               onPressed:
                                   _isSignInReady ? _handleSignIn : null,
@@ -743,13 +747,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               style: ElevatedButton.styleFrom(
                                 elevation: _isSignUpReady ? 2 : 0,
                                 foregroundColor: Colors.white,
-                                backgroundColor: MaterialStateProperty
-                                    .resolveWith((states) {
-                                  if (states.contains(MaterialState.disabled)) {
-                                    return Colors.grey.shade400;
-                                  }
-                                  return scheme.primary;
-                                }),
+                              ).copyWith(
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color?>(
+                                  (states) {
+                                    if (states
+                                        .contains(MaterialState.disabled)) {
+                                      return Colors.grey.shade400;
+                                    }
+                                    return scheme.primary;
+                                  },
+                                ),
                               ),
                               onPressed:
                                   _isSignUpReady ? _handleSignUp : null,
